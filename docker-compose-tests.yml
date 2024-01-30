@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+
+  tests:
+    env_file:
+      - .env
+    build: ./restaurant
+    container_name: menu_tests
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; pytest -vv'
+    volumes:
+      - .:/restaurant
+    environment:
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DATABASE}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    expose:
+      - 5432
+    restart: always
+    container_name: db
+    environment:
+        HOST: ${DB_HOST}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DATABASE}
+        POSTGRES_INITDB_ARGS: "-A md5"
+
+volumes:
+  postgres_data:
+

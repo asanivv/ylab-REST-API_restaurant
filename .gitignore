@@ -1,0 +1,7 @@
+venv
+.env
+*.db
+.idea
+__pycache__/
+restaurant/__pycache__/
+
